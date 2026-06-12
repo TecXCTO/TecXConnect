@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  # Container 1: The Core WebSocket Python Router
+  chat-server:
+    build: .
+    container_name: python_websocket_engine
+    ports:
+      - "8765:8765"
+    depends_on:
+      - redis-cache
+    environment:
+      - REDIS_URL=redis://redis-cache:6379
+    restart: always
+
+  # Container 2: Redis Cache Core for Session tracking and Pub/Sub routing
+  redis-cache:
+    image: redis:7-alpine
+    container_name: shared_redis_bus
+    ports:
+      - "6379:6379"
+    restart: always
+    
