@@ -39,11 +39,21 @@ async def handle_client(websocket):
                     "from": username,
                     "text": msg.get("text")
                 })
-                
                 # Direct routing to recipient if they are currently online
                 if target in connected_users:
                     await connected_users[target].send(outbound_payload)
-                    
+            # Insert this check right alongside your 'chat_message' block
+            if msg.get("type") == "typing_event":
+                target = msg.get("to")
+                typing_payload = json.dumps({
+                    "type": "incoming_typing",
+                    "from": username,
+                    "status": msg.get("status")
+                })
+                if target in connected_users:
+                    await connected_users[target].send(typing_payload)
+        
+                
     except websockets.exceptions.ConnectionClosed:
         pass
     finally:
